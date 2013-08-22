@@ -1,0 +1,857 @@
+<!--
+
+  $Id: LabAcceptor.xml 106 2008-04-29 16:39:37Z jeff $
+
+  Authors:
+       Jeff Buchbinder <jeff@freemedsoftware.org>
+
+  FreeMED Electronic Medical Record and Practice Management System
+  Copyright (C) 1999-2008 FreeMED Software Foundation
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+-->
+<com.webreach.mirth.model.Channel>
+  <id>ad7cea0c-5a22-4de1-a8ab-cbbc2a04b33e</id>
+  <name>Labs Acceptor</name>
+  <description>Listens for incoming lab results from an external source and inserts them into the FreeMed MySQL Database.&#x0D;
+&#x0D;
+jeff@freemedsoftware.org</description>
+  <enabled>true</enabled>
+  <version>1.7.0.3207</version>
+  <lastModified>
+    <time>1201635270083</time>
+    <timezone>America/New_York</timezone>
+  </lastModified>
+  <revision>78</revision>
+  <sourceConnector>
+    <name>sourceConnector</name>
+    <properties>
+      <property name="messageEnd">0x1C</property>
+      <property name="ackCodeError">AE</property>
+      <property name="messageStart">0x0B</property>
+      <property name="ackMsgRejected">Message Rejected.</property>
+      <property name="ackCodeRejected">AR</property>
+      <property name="receiveTimeout">0</property>
+      <property name="charEncoding">hex</property>
+      <property name="bufferSize">65536</property>
+      <property name="useStrictLLP">1</property>
+      <property name="reconnectInterval">5000</property>
+      <property name="waitForEndOfMessageCharacter">0</property>
+      <property name="sendACK">1</property>
+      <property name="port">10005</property>
+      <property name="ackOnNewConnection">0</property>
+      <property name="checkMSH15">0</property>
+      <property name="ackMsgSuccessful"></property>
+      <property name="tcpProtocolClassName">org.mule.providers.tcp.protocols.TcpProtocol</property>
+      <property name="responseFromTransformer">0</property>
+      <property name="segmentEnd">0x0D</property>
+      <property name="ackPort"></property>
+      <property name="charsetEncoding">DEFAULT_ENCODING</property>
+      <property name="host">127.0.0.1</property>
+      <property name="responseValue">None</property>
+      <property name="DataType">LLP Listener</property>
+      <property name="processBatchFiles">1</property>
+      <property name="ackMsgError">An Error Occured Processing Message.</property>
+      <property name="serverMode">1</property>
+      <property name="ackCodeSuccessful">AA</property>
+      <property name="ackIP"></property>
+      <property name="recordSeparator">0x0D</property>
+    </properties>
+    <transformer>
+      <steps>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>0</sequenceNumber>
+          <name>obxMessageType</name>
+          <script>channelMap.put(&apos;obxMessageType&apos;, validate(msg[&apos;OBX&apos;][&apos;OBX.3&apos;][&apos;OBX.3.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>obxMessageType</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;OBX&apos;][&apos;OBX.3&apos;][&apos;OBX.3.1&apos;].toString()</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>channel</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>1</sequenceNumber>
+          <name>obxObservationValue</name>
+          <script>channelMap.put(&apos;obxObservationValue&apos;, validate(msg[&apos;OBX&apos;][&apos;OBX.5&apos;][&apos;OBX.5.1&apos;].toString().replace(/\\E/g, &quot;&quot;).replace(/\\r/g, &quot;&lt;br&gt;&quot;), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>obxObservationValue</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;OBX&apos;][&apos;OBX.5&apos;][&apos;OBX.5.1&apos;].toString().replace(/\\E/g, &quot;&quot;).replace(/\\r/g, &quot;&lt;br&gt;&quot;)</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>channel</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>2</sequenceNumber>
+          <name>providerId_ref</name>
+          <script>channelMap.put(&apos;providerId_ref&apos;, validate(msg[&apos;OBR&apos;][&apos;OBR.16&apos;][&apos;OBR.16.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>providerId_ref</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;OBR&apos;][&apos;OBR.16&apos;][&apos;OBR.16.1&apos;].toString()</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>channel</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>3</sequenceNumber>
+          <name>patientId_ref</name>
+          <script>channelMap.put(&apos;patientId_ref&apos;, validate(msg[&apos;PID&apos;][&apos;PID.3&apos;][&apos;PID.3.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>patientId_ref</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;PID&apos;][&apos;PID.3&apos;][&apos;PID.3.1&apos;].toString()</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>channel</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>4</sequenceNumber>
+          <name>labStatus_ORC_05</name>
+          <script>channelMap.put(&apos;labStatus_ORC_05&apos;, validate(msg[&apos;ORC&apos;][&apos;ORC.5&apos;][&apos;ORC.5.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>labStatus_ORC_05</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;ORC&apos;][&apos;ORC.5&apos;][&apos;ORC.5.1&apos;].toString()</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>channel</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>5</sequenceNumber>
+          <name>labOrderCode_OBR_04_03</name>
+          <script>channelMap.put(&apos;labOrderCode_OBR_04_03&apos;, validate(msg[&apos;OBR&apos;][&apos;OBR.4&apos;][&apos;OBR.4.3&apos;].toString(), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>labOrderCode_OBR_04_03</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;OBR&apos;][&apos;OBR.4&apos;][&apos;OBR.4.3&apos;].toString()</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>channel</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>6</sequenceNumber>
+          <name>labOrderDescription_OBR_04_04</name>
+          <script>connectorMap.put(&apos;labOrderDescription_OBR_04_04&apos;, validate(msg[&apos;OBR&apos;][&apos;OBR.4&apos;][&apos;OBR.4.4&apos;].toString(), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>labOrderDescription_OBR_04_04</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;OBR&apos;][&apos;OBR.4&apos;][&apos;OBR.4.4&apos;].toString()</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>connector</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>7</sequenceNumber>
+          <name>labTimestamp_OBR_07</name>
+          <script>channelMap.put(&apos;labTimestamp_OBR_07&apos;, validate(msg[&apos;OBR&apos;][&apos;OBR.7&apos;][&apos;OBR.7.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>labTimestamp_OBR_07</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;OBR&apos;][&apos;OBR.7&apos;][&apos;OBR.7.1&apos;].toString()</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>channel</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+      </steps>
+      <inboundTemplate>MSH|^~\&amp;|LAB|100|MS4R|100|200801111532||ORU^R01|00004910|D|2.2&#x0D;PID|||110160||BUNNY^BUGS|||||||||||||005129176&#x0D;PV1|||EMR||||5503&#x0D;ORC|RE|00005|1||||||200801101458|||5503&#x0D;NTE|1||TEST] TEST]&#x0D;OBR|1|00005|1|3000619^HEMOGLOBIN A1C^^GLYC|||200801101555|||||||200801101555||||||||200801101554&#x0D;OBX|1|NM|A1C^HEMOGLOBIN A1C^^GLYCO||5.0|%HbA1c|4.6-6.2||||F&#x0D;</inboundTemplate>
+      <outboundTemplate></outboundTemplate>
+      <inboundProtocol>HL7V2</inboundProtocol>
+      <outboundProtocol>HL7V2</outboundProtocol>
+      <inboundProperties/>
+      <outboundProperties/>
+    </transformer>
+    <filter>
+      <rules/>
+    </filter>
+    <transportName>LLP Listener</transportName>
+    <mode>SOURCE</mode>
+    <enabled>true</enabled>
+  </sourceConnector>
+  <destinationConnectors>
+    <com.webreach.mirth.model.Connector>
+      <name>FreeMed MySQL Database</name>
+      <properties>
+        <property name="username">freemed</property>
+        <property name="DataType">Database Writer</property>
+        <property name="useScript">1</property>
+        <property name="URL">jdbc:mysql://localhost:3306/freemed</property>
+        <property name="query"></property>
+        <property name="script"> // Lab Results insertion
+ //
+ // Authors:
+ //      Jeff Buchbinder &lt;jeff@freemedsoftware.org&gt;
+ //
+ // FreeMED Electronic Medical Record and Practice Management System
+ // Copyright (C) 1999-2008 FreeMED Software Foundation
+ //
+ // This program is free software; you can redistribute it and/or modify
+ // it under the terms of the GNU General Public License as published by
+ // the Free Software Foundation; either version 2 of the License, or
+ // (at your option) any later version.
+ //
+ // This program is distributed in the hope that it will be useful,
+ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ // GNU General Public License for more details.
+ //
+ // You should have received a copy of the GNU General Public License
+ // along with this program; if not, write to the Free Software
+ // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+var dbConn = DatabaseConnectionFactory.createDatabaseConnection(
+	  &apos;com.mysql.jdbc.Driver&apos; // database driver
+	, &apos;jdbc:mysql://localhost:3306/freemed&apos; // URL to database
+	, &apos;freemed&apos; // username
+	, &apos;freemed&apos; // password
+);
+
+// DatabaseWriter does not automatically have access to msg object
+// Move this in from the channel map
+var msg = channelMap.get( &apos;msg&apos; );
+logger.info( &quot;msg = &quot; + msg.toString() );
+
+//-----------------------------------------------------------------------------------------
+//----- Library functions
+//-----------------------------------------------------------------------------------------
+
+function addslashes( str ) {
+	// Handle null strings
+        if ( (str == null) || (str.toString() == &apos;&apos;) ) {
+            return &quot;&quot;;
+        } else { 
+            str = str.toString();
+        }
+
+	// Otherwise, PHP style addslashes
+        try {
+	    str = str.replace( &apos;\\&apos;, &apos;\\\\&apos; );
+	    str = escape( str );
+	    str = str.replace( &quot;&apos;&quot;, &apos;\\\&apos;&apos; );
+	    str = str.replace( &apos;&quot;&apos;, &apos;\\&quot;&apos; );
+	    str = unescape( str );
+        } catch (e) { }
+	return str;
+}
+
+function getLastInsertedId( ) {
+	var id = 0;
+	var idQuery = dbConn.executeCachedQuery( &quot;SELECT LAST_INSERT_ID();&quot; );
+	if ( idQuery.next() ) {
+		id = idQuery.getString( 1 ).trim();
+	} else {
+		logger.error(&quot;No LAST_INSERT_ID() found. Horrible error!&quot;);
+	}
+	idQuery.close();
+	return id;
+}
+
+function fixTimestamp( original ) {
+    // Liberally &quot;robbed&quot; from http://www.mirthproject.org/index.php?option=com_docman&amp;task=doc_view&amp;gid=15&amp;Itemid=43
+    var discharge = original;
+
+    if( (discharge == null) || (discharge.toString() == &apos;&apos;) ) {
+        discharge = &apos;&apos;;
+    } else { 
+        discharge = discharge.toString();
+    }
+
+    var dr = discharge.match(/(\d\d\d\d)(\d\d)(\d\d)(\d\d)?(\d\d)?(\d\d)?/);
+    if( dr == null ) {
+        //match to the SQL default
+        discharge = &apos;19000101&apos;;
+        discharge.match(/(\d\d\d\d)(\d\d)(\d\d)(\d\d)?(\d\d)?(\d\d)?/);
+    }
+    var dischargestr = RegExp.$1 + &apos;-&apos; + RegExp.$2 + &apos;-&apos; + RegExp.$3;
+    if( (RegExp.$4 != null ) &amp;&amp; (RegExp.$4 != &apos;&apos;) ) {
+        //RegExp.$4 indicates if optional hour was given. 
+        if( (RegExp.$5 != null ) &amp;&amp; (RegExp.$5 != &apos;&apos;) ) {
+            dischargestr += &apos; &apos; + RegExp.$4 + &apos;:&apos; + RegExp.$5;
+        } else {
+            dischargestr += &apos; &apos; + RegExp.$4 + &apos;:00&apos;;
+        }
+    }
+    if( (RegExp.$6 != null ) &amp;&amp; (RegExp.$6 != &apos;&apos;) ) {
+        dischargestr += &apos;:&apos; + RegExp.$6;
+    }
+
+    return dischargestr;
+}
+
+//-----------------------------------------------------------------------------------------
+//----- Execution code starts here
+//-----------------------------------------------------------------------------------------
+
+// Look up providerId
+var query = &quot;SELECT phy.provider_id AS provider_id &quot; +
+		&quot;FROM hl7_lookup_provider phy &quot; +
+		&quot;WHERE phy.hl7_provider = &apos;&quot; + $(&apos;providerId_ref&apos;)  + &quot;&apos;;&quot;;
+logger.info( &quot;id lookup query = &quot; + query );
+var result = dbConn.executeCachedQuery( query );
+var providerId = &quot;&quot;;
+var patientId = &quot;&quot;;
+if ( result.next() ) {
+	providerId = result.getString(1).trim();
+        logger.info( &quot;providerId = &quot; + providerId );
+} else {
+	logger.error(&quot;No matching providerId found with providerId_ref = &apos;&quot; + $(&apos;providerId_ref&apos;) + &quot;&apos;&quot;);
+}
+result.close();
+
+// Need to try to resolve patient ID separately
+// ( Requires _hl7.sql from FreeMED 0.9.x+ )
+var resolveExpression = &quot;CALL HL7v2_Resolve_PID_Direct ( &quot;
+		+ &quot;  &apos;&quot; + addslashes( patientId ) + &quot;&apos; &quot;
+		+ &quot;, &apos;&quot; + addslashes( $(&apos;patientLastName&apos;) ) + &quot;&apos; &quot;
+		+ &quot;, &apos;&quot; + addslashes( $(&apos;patientFirstName&apos;) ) + &quot;&apos; &quot;
+		+ &quot;, &apos;&quot; + addslashes( $(&apos;patientMiddleName&apos;) ) + &quot;&apos; &quot;
+		+ &quot; ) &quot;;
+logger.info( &apos;HL7_v2_Resolve_PID_Direct : &apos; + resolveExpression );
+var resolveResult = dbConn.executeCachedQuery( resolveExpression ); 
+resolveResult.next(); 
+var iReturnVal = resolveResult.getString( 1 );  
+if (iReturnVal &gt; 0) {
+    logger.info( &apos;Found patient ID as &apos; + iReturnVal ); 
+    patientId = iReturnVal;
+} else {
+    logger.error( &apos;Failed to resolve patient ID&apos; );   
+}
+
+// Handle note segments if they exist
+var notes = &quot;&quot;;
+var noteCount = 0;
+if ( msg[&apos;NTE&apos;][0] != undefined ) {
+    while( msg[&apos;NTE&apos;][noteCount] != undefined &amp;&amp; noteCount &lt; 100 ) {
+        try {
+            notes += msg[&apos;NTE&apos;][noteCount][&apos;NTE.3&apos;][&apos;NTE.3.1&apos;].toString() + &quot;\n&quot;;
+        } catch (e) {
+            notes += &quot;\n&quot;;
+        }
+        noteCount++;
+    }
+    logger.debug( &quot;Ended with noteCount = &quot; + noteCount.toString() );
+}
+
+// Create initial OBR record in &quot;labs&quot; table
+logger.info( &quot;orig timestamp = &quot; + $(&apos;labTimestamp_OBR_07&apos;) );
+logger.info( &quot;timestamp = &quot; + fixTimestamp( $(&apos;labTimestamp_OBR_07&apos;) ) );
+query = &quot;INSERT INTO labs ( &quot; +
+		&quot;   labpatient &quot; +
+		&quot; , labprovider &quot; +
+		&quot; , labstatus &quot; +
+		&quot; , labordercode &quot; +
+		&quot; , laborderdescrip &quot; +
+		&quot; , labtimestamp &quot; +
+		&quot; , labnotes &quot; +
+	&quot; ) VALUES ( &quot;+
+		&quot;   &apos;&quot;+addslashes( patientId                   )+&quot;&apos; &quot; +
+		&quot; , &apos;&quot;+addslashes( providerId                  )+&quot;&apos; &quot; +
+		&quot; , &apos;&quot;+addslashes( $(&apos;labStatus_ORC_05&apos;)       )+&quot;&apos; &quot; +
+		&quot; , &apos;&quot;+addslashes( $(&apos;labOrderCode_OBR_04_03&apos;) )+&quot;&apos; &quot; +
+		&quot; , &apos;&quot;+addslashes( $(&apos;labOrderDescription&apos;)    )+&quot;&apos; &quot; +
+		&quot; , &apos;&quot;+addslashes( fixTimestamp( $(&apos;labTimestamp_OBR_07&apos;) )   )+&quot;&apos; &quot; +
+                &quot; , &apos;&quot;+addslashes( notes                       )+&quot;&apos; &quot; +
+	&quot; );&quot;;
+
+logger.debug( &quot;query = &quot; + query );
+result = dbConn.executeUpdate(query);
+
+logger.info( &quot;Getting inserted lab id&quot; );
+var labId = getLastInsertedId( );
+logger.info( &quot;Lab id = &quot; + labId );
+
+var obxCount = channelMap.get( &apos;obxCount&apos; );
+
+logger.info( &quot;obxCount = &quot; + obxCount.toString() );
+if ( obxCount &gt; 0 ) {
+    logger.info( &quot;Proceeding, expecting &quot; + obxCount.toString() + &quot; OBX segments&quot; ); 
+    for ( var count=0; count &lt; obxCount; count++ ) {
+	logger.info( &quot;Processing OBX segment &quot; + count );
+	var resultQuery = &quot;INSERT INTO labresults ( &quot; +
+			&quot;   labpatient &quot; +
+			&quot; , labid &quot; +
+			&quot; , labobscode &quot; +
+			&quot; , labobsdescrip &quot; +
+			&quot; , labobsabnormal &quot; +
+			&quot; , labobsstatus &quot; +
+			&quot; , labobsvalue &quot; +
+			&quot; , labobsranges &quot; +
+			&quot; , labobsunit &quot; +
+		&quot; ) VALUES ( &quot;+
+			&quot;   &apos;&quot;+addslashes( patientId )+&quot;&apos; &quot; + // labpatient
+			&quot; , &apos;&quot;+addslashes( labId )+&quot;&apos; &quot; + // labid
+			&quot; , &apos;&quot;+addslashes( msg[&apos;OBX&apos;][count][&apos;OBX.3&apos;][&apos;OBX.3.1&apos;].toString()   )+&quot;&apos; &quot; + // code
+			&quot; , &apos;&quot;+addslashes( msg[&apos;OBX&apos;][count][&apos;OBX.3&apos;][&apos;OBX.3.2&apos;].toString()   )+&quot;&apos; &quot; + // descrip
+			&quot; , &apos;&quot;+addslashes( msg[&apos;OBX&apos;][count][&apos;OBX.8&apos;][&apos;OBX.8.1&apos;].toString()   )+&quot;&apos; &quot; + // abnormal
+			&quot; , &apos;&quot;+addslashes( msg[&apos;OBX&apos;][count][&apos;OBX.11&apos;][&apos;OBX.11.1&apos;].toString() )+&quot;&apos; &quot; + // obsstatus
+			&quot; , &apos;&quot;+addslashes( msg[&apos;OBX&apos;][count][&apos;OBX.5&apos;][&apos;OBX.5.1&apos;].toString()   )+&quot;&apos; &quot; + // value
+			&quot; , &apos;&quot;+addslashes( msg[&apos;OBX&apos;][count][&apos;OBX.7&apos;][&apos;OBX.7.1&apos;].toString()   )+&quot;&apos; &quot; + // ranges
+			&quot; , &apos;&quot;+addslashes( msg[&apos;OBX&apos;][count][&apos;OBX.6&apos;][&apos;OBX.6.1&apos;].toString()   )+&quot;&apos; &quot; + // unit
+		&quot; );&quot;;
+	logger.info( &quot;query = &quot; + resultQuery );
+        try { 
+	    var obxResult = dbConn.executeUpdate( resultQuery );
+	    logger.info( &quot;Finished executing INSERT query, id = &quot; + getLastInsertedId( ) );
+        } catch (e) {
+            logger.info( e.toString() );
+        }
+    }
+}
+
+dbConn.close();
+</property>
+        <property name="password">freemed</property>
+        <property name="host">query</property>
+        <property name="driver">com.mysql.jdbc.Driver</property>
+      </properties>
+      <transformer>
+        <steps>
+          <com.webreach.mirth.model.Step>
+            <sequenceNumber>0</sequenceNumber>
+            <name>patientLastName</name>
+            <script>channelMap.put(&apos;patientLastName&apos;, validate(msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+            <type>Mapper</type>
+            <data class="map">
+              <entry>
+                <string>Variable</string>
+                <string>patientLastName</string>
+              </entry>
+              <entry>
+                <string>DefaultValue</string>
+                <string></string>
+              </entry>
+              <entry>
+                <string>RegularExpressions</string>
+                <list/>
+              </entry>
+              <entry>
+                <string>Mapping</string>
+                <string>msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.1&apos;].toString()</string>
+              </entry>
+              <entry>
+                <string>isGlobal</string>
+                <string>channel</string>
+              </entry>
+            </data>
+          </com.webreach.mirth.model.Step>
+          <com.webreach.mirth.model.Step>
+            <sequenceNumber>1</sequenceNumber>
+            <name>patientFirstName</name>
+            <script>channelMap.put(&apos;patientFirstName&apos;, validate(msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.2&apos;].toString(), &apos;&apos;, new Array()));</script>
+            <type>Mapper</type>
+            <data class="map">
+              <entry>
+                <string>Variable</string>
+                <string>patientFirstName</string>
+              </entry>
+              <entry>
+                <string>DefaultValue</string>
+                <string></string>
+              </entry>
+              <entry>
+                <string>RegularExpressions</string>
+                <list/>
+              </entry>
+              <entry>
+                <string>Mapping</string>
+                <string>msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.2&apos;].toString()</string>
+              </entry>
+              <entry>
+                <string>isGlobal</string>
+                <string>channel</string>
+              </entry>
+            </data>
+          </com.webreach.mirth.model.Step>
+          <com.webreach.mirth.model.Step>
+            <sequenceNumber>2</sequenceNumber>
+            <name>patientMiddleName</name>
+            <script>channelMap.put(&apos;patientMiddleName&apos;, validate(msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.3&apos;].toString(), &apos;&apos;, new Array()));</script>
+            <type>Mapper</type>
+            <data class="map">
+              <entry>
+                <string>Variable</string>
+                <string>patientMiddleName</string>
+              </entry>
+              <entry>
+                <string>DefaultValue</string>
+                <string></string>
+              </entry>
+              <entry>
+                <string>RegularExpressions</string>
+                <list/>
+              </entry>
+              <entry>
+                <string>Mapping</string>
+                <string>msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.3&apos;].toString()</string>
+              </entry>
+              <entry>
+                <string>isGlobal</string>
+                <string>channel</string>
+              </entry>
+            </data>
+          </com.webreach.mirth.model.Step>
+          <com.webreach.mirth.model.Step>
+            <sequenceNumber>3</sequenceNumber>
+            <name>providerId_ref</name>
+            <script>channelMap.put(&apos;providerId_ref&apos;, validate(msg[&apos;PV1&apos;][&apos;PV1.7&apos;][&apos;PV1.7.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+            <type>Mapper</type>
+            <data class="map">
+              <entry>
+                <string>Variable</string>
+                <string>providerId_ref</string>
+              </entry>
+              <entry>
+                <string>DefaultValue</string>
+                <string></string>
+              </entry>
+              <entry>
+                <string>RegularExpressions</string>
+                <list/>
+              </entry>
+              <entry>
+                <string>Mapping</string>
+                <string>msg[&apos;PV1&apos;][&apos;PV1.7&apos;][&apos;PV1.7.1&apos;].toString()</string>
+              </entry>
+              <entry>
+                <string>isGlobal</string>
+                <string>channel</string>
+              </entry>
+            </data>
+          </com.webreach.mirth.model.Step>
+          <com.webreach.mirth.model.Step>
+            <sequenceNumber>4</sequenceNumber>
+            <name>labStatus_ORC_05</name>
+            <script>channelMap.put(&apos;labStatus_ORC_05&apos;, validate(msg[&apos;ORC&apos;][&apos;ORC.5&apos;][&apos;ORC.5.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+            <type>Mapper</type>
+            <data class="map">
+              <entry>
+                <string>Variable</string>
+                <string>labStatus_ORC_05</string>
+              </entry>
+              <entry>
+                <string>DefaultValue</string>
+                <string></string>
+              </entry>
+              <entry>
+                <string>RegularExpressions</string>
+                <list/>
+              </entry>
+              <entry>
+                <string>Mapping</string>
+                <string>msg[&apos;ORC&apos;][&apos;ORC.5&apos;][&apos;ORC.5.1&apos;].toString()</string>
+              </entry>
+              <entry>
+                <string>isGlobal</string>
+                <string>channel</string>
+              </entry>
+            </data>
+          </com.webreach.mirth.model.Step>
+          <com.webreach.mirth.model.Step>
+            <sequenceNumber>5</sequenceNumber>
+            <name>labOrderCode_OBR_04_03</name>
+            <script>channelMap.put(&apos;labOrderCode_OBR_04_03&apos;, validate(msg[&apos;OBR&apos;][&apos;OBR.4&apos;][&apos;OBR.4.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+            <type>Mapper</type>
+            <data class="map">
+              <entry>
+                <string>Variable</string>
+                <string>labOrderCode_OBR_04_03</string>
+              </entry>
+              <entry>
+                <string>DefaultValue</string>
+                <string></string>
+              </entry>
+              <entry>
+                <string>RegularExpressions</string>
+                <list/>
+              </entry>
+              <entry>
+                <string>Mapping</string>
+                <string>msg[&apos;OBR&apos;][&apos;OBR.4&apos;][&apos;OBR.4.1&apos;].toString()</string>
+              </entry>
+              <entry>
+                <string>isGlobal</string>
+                <string>channel</string>
+              </entry>
+            </data>
+          </com.webreach.mirth.model.Step>
+          <com.webreach.mirth.model.Step>
+            <sequenceNumber>6</sequenceNumber>
+            <name>labTimestamp_OBR_07</name>
+            <script>channelMap.put(&apos;labTimestamp_OBR_07&apos;, validate(msg[&apos;OBR&apos;][&apos;OBR.7&apos;][&apos;OBR.7.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+            <type>Mapper</type>
+            <data class="map">
+              <entry>
+                <string>Variable</string>
+                <string>labTimestamp_OBR_07</string>
+              </entry>
+              <entry>
+                <string>DefaultValue</string>
+                <string></string>
+              </entry>
+              <entry>
+                <string>RegularExpressions</string>
+                <list/>
+              </entry>
+              <entry>
+                <string>Mapping</string>
+                <string>msg[&apos;OBR&apos;][&apos;OBR.7&apos;][&apos;OBR.7.1&apos;].toString()</string>
+              </entry>
+              <entry>
+                <string>isGlobal</string>
+                <string>channel</string>
+              </entry>
+            </data>
+          </com.webreach.mirth.model.Step>
+          <com.webreach.mirth.model.Step>
+            <sequenceNumber>7</sequenceNumber>
+            <name>labOrderDescription</name>
+            <script>channelMap.put(&apos;labOrderDescription&apos;, validate(msg[&apos;OBR&apos;][&apos;OBR.4&apos;][&apos;OBR.4.2&apos;].toString(), &apos;&apos;, new Array()));</script>
+            <type>Mapper</type>
+            <data class="map">
+              <entry>
+                <string>Variable</string>
+                <string>labOrderDescription</string>
+              </entry>
+              <entry>
+                <string>DefaultValue</string>
+                <string></string>
+              </entry>
+              <entry>
+                <string>RegularExpressions</string>
+                <list/>
+              </entry>
+              <entry>
+                <string>Mapping</string>
+                <string>msg[&apos;OBR&apos;][&apos;OBR.4&apos;][&apos;OBR.4.2&apos;].toString()</string>
+              </entry>
+              <entry>
+                <string>isGlobal</string>
+                <string>channel</string>
+              </entry>
+            </data>
+          </com.webreach.mirth.model.Step>
+          <com.webreach.mirth.model.Step>
+            <sequenceNumber>8</sequenceNumber>
+            <name>Javascript</name>
+            <script>/*
+var testResult = &quot;F&quot;;&#x0D;var count = 0;&#x0D;//msg..OBR returns every segment that matches OBR&#x0D;for each (obr in msg..OBR){&#x0D;	count++;&#x0D;	if (obr[&apos;OBR.25&apos;].text() == &apos;P&apos;){&#x0D;		testResult = &quot;P&quot;;&#x0D;	}&#x0D;}
+*/
+
+
+var obxCount = 0;
+try {
+    for each (obx in msg..OBX){&#x0D;	obxCount++;
+    }
+} catch (e) {
+    logger.info( e.toString() );
+}&#x0D;
+
+channelMap.put( &apos;obxCount&apos;, obxCount );&#x0D;channelMap.put( &apos;msg&apos;, msg );</script>
+            <type>JavaScript</type>
+            <data class="map">
+              <entry>
+                <string>Script</string>
+                <string>/*
+var testResult = &quot;F&quot;;&#x0D;var count = 0;&#x0D;//msg..OBR returns every segment that matches OBR&#x0D;for each (obr in msg..OBR){&#x0D;	count++;&#x0D;	if (obr[&apos;OBR.25&apos;].text() == &apos;P&apos;){&#x0D;		testResult = &quot;P&quot;;&#x0D;	}&#x0D;}
+*/
+
+
+var obxCount = 0;
+try {
+    for each (obx in msg..OBX){&#x0D;	obxCount++;
+    }
+} catch (e) {
+    logger.info( e.toString() );
+}&#x0D;
+
+channelMap.put( &apos;obxCount&apos;, obxCount );&#x0D;channelMap.put( &apos;msg&apos;, msg );</string>
+              </entry>
+            </data>
+          </com.webreach.mirth.model.Step>
+        </steps>
+        <inboundTemplate>MSH|^~\&amp;|PAT|100|MS4R|100|200801291250||ORU^R01|08012912502710238215|D|2.2&#x0D;PID|||029403||DOWNING^LYNDA^D|||||||||||||2000081475&#x0D;PV1|||MA&#x0D;ORC|RE||SVR-08-308||||||200801281206|||1396&#x0D;OBR|1||SVR-08-308|GSFLX^SPLENIC FLEXURE BIOPSY   (88305)|||200801250000|||||||200801281206||||||||200801291250&#x0D;OBX|1|ST|GSFLX^SPLENIC FLEXURE BIOPSY   (88305)||SEE BELOW||||||F&#x0D;NTE|1||PATIENT:    DOWNING,  LYNDA D          LOCATION:    MT ASCUTNEY HOSPITAL&#x0D;NTE|2||MR #:            0029403               PHYSICIAN:    ROBINSON, ANDREW, MD&#x0D;NTE|3||DOB:             06/22/1942     AGE:   COLLECTED: 01/25/2008&#x0D;NTE|4||65 Y&#x0D;NTE|5||SEX:              F                    RECEIVED:     01/28/2008&#x0D;NTE|6||SSN:              008-30-1658          REPORTED:    01/29/2008&#x0D;NTE|7||ACCT:          2000081475              COPIES TO:&#x0D;NTE|8&#x0D;NTE|9||TISSUE SUBMITTED:&#x0D;NTE|10||1. SPLENIC FLEXURE BIOPSY   (88305), Lesion&#x0D;NTE|11&#x0D;NTE|12||PRE-OP DIAGNOSIS:  Screening&#x0D;NTE|13&#x0D;NTE|14||CLINICAL INFORMATION:  Anemia&#x0D;NTE|15&#x0D;NTE|16||GROSS DESCRIPTION:  Received in fixative are two soft tan 5 mm.&#x0D;NTE|17||biopsies.  ESS as 1-1.  STB/rmc&#x0D;NTE|18&#x0D;NTE|19&#x0D;NTE|20&#x0D;NTE|21||FINAL DIAGNOSIS:&#x0D;NTE|22&#x0D;NTE|23||ADENOCARCINOMA IN-SITU IN BIOPSY OF COLON AT SPLENIC FLEXURE.&#x0D;NTE|24&#x0D;NTE|25||#&#x0D;NTE|26||LEWIS, BRUCE J., PATHOLOGIST&#x0D;</inboundTemplate>
+        <outboundTemplate></outboundTemplate>
+        <inboundProtocol>HL7V2</inboundProtocol>
+        <outboundProtocol>HL7V2</outboundProtocol>
+        <inboundProperties>
+          <property name="handleRepetitions">false</property>
+          <property name="encodeEntities">true</property>
+          <property name="convertLFtoCR">true</property>
+          <property name="useStrictValidation">false</property>
+          <property name="useStrictParser">false</property>
+        </inboundProperties>
+        <outboundProperties/>
+      </transformer>
+      <filter>
+        <rules/>
+      </filter>
+      <transportName>Database Writer</transportName>
+      <mode>DESTINATION</mode>
+      <enabled>true</enabled>
+    </com.webreach.mirth.model.Connector>
+  </destinationConnectors>
+  <properties>
+    <property name="synchronous">true</property>
+    <property name="removeNamespace">true</property>
+    <property name="transactional">false</property>
+    <property name="initialState">started</property>
+    <property name="dont_store_filtered">false</property>
+    <property name="error_messages_only">false</property>
+    <property name="max_message_age">-1</property>
+    <property name="store_messages">true</property>
+    <property name="encryptData">true</property>
+  </properties>
+  <preprocessingScript>// Modify the message variable below to pre process data
+return message;</preprocessingScript>
+  <postprocessingScript>// This script executes once after a message has been processed
+return;</postprocessingScript>
+  <deployScript>// This script executes once when the mule engine is started
+// You only have access to the globalMap here to persist data
+return;</deployScript>
+  <shutdownScript>// This script executes once when the mule engine is stopped
+// You only have access to the globalMap here to persist data
+return;</shutdownScript>
+</com.webreach.mirth.model.Channel>

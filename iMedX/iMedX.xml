@@ -1,0 +1,480 @@
+<!--
+
+  $Id: iMedX.xml 105 2008-04-29 16:36:01Z jeff $
+
+  Authors:
+       Jeff Buchbinder <jeff@freemedsoftware.org>
+
+  FreeMED Electronic Medical Record and Practice Management System
+  Copyright (C) 1999-2007 FreeMED Software Foundation
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+-->
+<com.webreach.mirth.model.Channel>
+  <id>44f17efe-a893-4646-be66-b23e1412bd34</id>
+  <name>iMedX LLP Listener</name>
+  <description>Listens for incoming transcripts, parse them, and then insert them into FreeMed MySQL Database.&#x0D;
+</description>
+  <enabled>true</enabled>
+  <version>1.7.0.3207</version>
+  <lastModified>
+    <time>1209235841686</time>
+    <timezone>America/New_York</timezone>
+  </lastModified>
+  <revision>34</revision>
+  <sourceConnector>
+    <name>sourceConnector</name>
+    <properties>
+      <property name="messageEnd">0x1C</property>
+      <property name="ackCodeError">AE</property>
+      <property name="messageStart">0x0B</property>
+      <property name="ackMsgRejected">Message Rejected.</property>
+      <property name="ackCodeRejected">AR</property>
+      <property name="receiveTimeout">0</property>
+      <property name="charEncoding">hex</property>
+      <property name="bufferSize">65536</property>
+      <property name="useStrictLLP">1</property>
+      <property name="reconnectInterval">5000</property>
+      <property name="waitForEndOfMessageCharacter">0</property>
+      <property name="sendACK">1</property>
+      <property name="port">6661</property>
+      <property name="ackOnNewConnection">0</property>
+      <property name="checkMSH15">0</property>
+      <property name="ackMsgSuccessful"></property>
+      <property name="tcpProtocolClassName">org.mule.providers.tcp.protocols.TcpProtocol</property>
+      <property name="responseFromTransformer">0</property>
+      <property name="segmentEnd">0x0D</property>
+      <property name="ackPort"></property>
+      <property name="charsetEncoding">DEFAULT_ENCODING</property>
+      <property name="host">127.0.0.1</property>
+      <property name="responseValue">None</property>
+      <property name="DataType">LLP Listener</property>
+      <property name="processBatchFiles">1</property>
+      <property name="ackMsgError">An Error Occured Processing Message.</property>
+      <property name="serverMode">1</property>
+      <property name="ackCodeSuccessful">AA</property>
+      <property name="ackIP"></property>
+      <property name="recordSeparator">0x0D</property>
+    </properties>
+    <transformer>
+      <steps>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>0</sequenceNumber>
+          <name>obxMessageType</name>
+          <script>channelMap.put(&apos;obxMessageType&apos;, validate(msg[&apos;OBX&apos;][&apos;OBX.3&apos;][&apos;OBX.3.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>obxMessageType</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;OBX&apos;][&apos;OBX.3&apos;][&apos;OBX.3.1&apos;].toString()</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>channel</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>1</sequenceNumber>
+          <name>obxObservationValue</name>
+          <script>channelMap.put(&apos;obxObservationValue&apos;, validate(msg[&apos;OBX&apos;][&apos;OBX.5&apos;][&apos;OBX.5.1&apos;].toString().replace(/\\E/g, &quot;&quot;).replace(/\\r/g, &quot;&lt;br&gt;&quot;), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>obxObservationValue</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;OBX&apos;][&apos;OBX.5&apos;][&apos;OBX.5.1&apos;].toString().replace(/\\E/g, &quot;&quot;).replace(/\\r/g, &quot;&lt;br&gt;&quot;)</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>channel</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>2</sequenceNumber>
+          <name>providerId_ref</name>
+          <script>channelMap.put(&apos;providerId_ref&apos;, validate(msg[&apos;OBR&apos;][&apos;OBR.16&apos;][&apos;OBR.16.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>providerId_ref</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;OBR&apos;][&apos;OBR.16&apos;][&apos;OBR.16.1&apos;].toString()</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>channel</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+        <com.webreach.mirth.model.Step>
+          <sequenceNumber>3</sequenceNumber>
+          <name>patientId_ref</name>
+          <script>channelMap.put(&apos;patientId_ref&apos;, validate(msg[&apos;PID&apos;][&apos;PID.3&apos;][&apos;PID.3.1&apos;].toString(), &apos;&apos;, new Array()));</script>
+          <type>Mapper</type>
+          <data class="map">
+            <entry>
+              <string>Variable</string>
+              <string>patientId_ref</string>
+            </entry>
+            <entry>
+              <string>DefaultValue</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>RegularExpressions</string>
+              <list/>
+            </entry>
+            <entry>
+              <string>Mapping</string>
+              <string>msg[&apos;PID&apos;][&apos;PID.3&apos;][&apos;PID.3.1&apos;].toString()</string>
+            </entry>
+            <entry>
+              <string>isGlobal</string>
+              <string>channel</string>
+            </entry>
+          </data>
+        </com.webreach.mirth.model.Step>
+      </steps>
+      <inboundTemplate>MSH|^~\&amp;|iMedX||||20070330112328||ORU^R01|21643|T|2.3&#x0D;</inboundTemplate>
+      <outboundTemplate></outboundTemplate>
+      <inboundProtocol>HL7V2</inboundProtocol>
+      <outboundProtocol>HL7V2</outboundProtocol>
+      <inboundProperties/>
+      <outboundProperties/>
+    </transformer>
+    <filter>
+      <rules/>
+    </filter>
+    <transportName>LLP Listener</transportName>
+    <mode>SOURCE</mode>
+    <enabled>true</enabled>
+  </sourceConnector>
+  <destinationConnectors>
+    <com.webreach.mirth.model.Connector>
+      <name>FreeMed MySQL Database</name>
+      <properties>
+        <property name="username">freemed</property>
+        <property name="DataType">Database Writer</property>
+        <property name="useScript">1</property>
+        <property name="URL">jdbc:mysql://localhost:3306/freemed</property>
+        <property name="query"></property>
+        <property name="script">var dbConn = DatabaseConnectionFactory.createDatabaseConnection(&apos;com.mysql.jdbc.Driver&apos;,&apos;jdbc:mysql://localhost:3306/freemed&apos;,&apos;freemed&apos;,&apos;freemed&apos;);
+
+function addslashes( str ) {
+	// Handle null strings
+        if ( (str == null) || (str.toString() == &apos;&apos;) ) {
+            return &quot;&quot;;
+        } else { 
+            str = str.toString();
+        }
+
+	// Otherwise, PHP style addslashes
+        try {
+/*
+	    str = str.replace( &apos;\\&apos;, &apos;\\\\&apos; );
+	    str = escape( str );
+            str = str.replace(/%27/g, &apos;\\\&apos;&apos;);
+	    str = str.replace( &quot;&apos;&quot;, &apos;\\\&apos;&apos; );
+	    str = str.replace( &apos;&quot;&apos;, &apos;\\&quot;&apos; );
+	    str = unescape( str );
+*/
+            str = str.replace(/\\/g, &apos;\\\\&apos;);
+            str = escape(str);
+            str = str.replace(/%27/g, &apos;\\\&apos;&apos;);
+            str = str.replace(/%22/g, &apos;\\&quot;&apos;);
+            str = unescape(str);
+        } catch (e) { }
+	return str;
+}
+
+/*
+	str = str.replace(/\\/g, &apos;\\\\&apos;);
+	str = escape(str);
+	str = str.replace(/%27/g, &apos;\\\&apos;&apos;);
+	str = str.replace(/%22/g, &apos;\\&quot;&apos;);
+	str = unescape(str);
+	return str;
+*/
+
+function getLastInsertedId( ) {
+	var id = 0;
+	var idQuery = dbConn.executeCachedQuery( &quot;SELECT LAST_INSERT_ID();&quot; );
+	if ( idQuery.next() ) {
+		id = idQuery.getString( 1 ).trim();
+	} else {
+		logger.error(&quot;No LAST_INSERT_ID() found. Horrible error!&quot;);
+	}
+	idQuery.close();
+	return id;
+}
+
+// Look up providerId and patientId
+var query = &quot;SELECT phy.provider_id AS provider_id, pt.id AS patient_id &quot; +
+		&quot;FROM hl7_lookup_provider phy, patient pt &quot; +
+		&quot;WHERE phy.hl7_provider = &apos;&quot; + $(&apos;providerId_ref&apos;)  + &quot;&apos; &quot; + 
+		&quot;AND pt.ptid = &apos;&quot; + $(&apos;patientId_ref&apos;) + &quot;&apos;&quot;;
+var result = dbConn.executeCachedQuery(query);
+var providerId = &quot;&quot;;
+var patientId = &quot;&quot;;
+if (result.next()) {
+	providerId = result.getString(1).trim();
+	patientId = result.getString(2).trim();
+} else {
+	logger.error(&quot;No matching providerId or patientId found with providerId_ref = &apos;&quot; + $(&apos;providerId_ref&apos;) + &quot;&apos; and patientId_ref = &apos;&quot; + $(&apos;patientId_ref&apos;) + &quot;&apos;&quot;);
+}
+result.close();
+
+var dosReg = /DATE OF SERVICE:\s+(\d+)\/(\d+)\/(\d+)/;		// 05/29/2007
+var dos = &quot;&quot;;
+var matchString = $(&apos;obxObservationValue&apos;).match(dosReg);
+var tableName = &apos;&apos;;
+
+if (matchString == null) {
+	dos = &quot;NOW()&quot;;
+} else {
+	dos = matchString[3] + &quot;-&quot; + matchString[1] + &quot;-&quot; + matchString[2];
+}
+
+if ($(&apos;obxMessageType&apos;) == &quot;PC&quot;) {
+	// Patient Correspondence
+	var obx = &quot;&quot;;
+	var letterContent = $(&apos;obxObservationValue&apos;).match(/Dear.*/ig);
+	if (letterContent == null) {
+		// No letter content found starting with word &quot;Dear&quot;
+		logger.error(&quot;No letter content found starting with word &apos;Dear&apos;&quot;);
+	} else {
+		var sincerelyIndex = letterContent[0].search(/Sincerely,.*/i);
+		if (sincerelyIndex != -1) {
+			// remove signature.
+                        try {
+			    obx = letterContent[0].replace(/Sincerely,.*/i, &apos;&apos;);
+                        } catch (e) { }
+		} else {
+			obx = letterContent[0];
+		}
+	}
+
+	obx = obx.replace(/\\n/g, &quot;&lt;br&gt;&quot;);
+	obx = obx.replace(&quot;\n&quot;, &quot;&lt;br&gt;&quot;);
+
+	if (dos == &quot;NOW()&quot;) {
+		query = &quot;INSERT INTO patletter ( letterdt, letterfrom, letterpatient, lettertypist, lettertext ) VALUES (&quot; + dos + &quot;, &apos;&quot; + providerId + &quot;&apos;, &quot; + patientId + &quot;, &apos;(iMedX)&apos;, &apos;&quot; + addslashes(obx) + &quot;&apos;)&quot;;
+	} else {
+		query = &quot;INSERT INTO patletter ( letterdt, letterfrom, letterpatient, lettertypist, lettertext ) VALUES (&apos;&quot; + dos + &quot;&apos;, &apos;&quot; + providerId + &quot;&apos;, &quot; + patientId + &quot;, &apos;(iMedX)&apos;, &apos;&quot; + addslashes(obx) + &quot;&apos;)&quot;;
+	}
+	tableName = &quot;patletter&quot;;
+
+} else if ($(&apos;obxMessageType&apos;) == &quot;TF&quot;) {
+	// Progress Note
+
+	// PATIENT CLASS: patientInfo&lt;br&gt;&lt;br&gt; ... ...
+	var obx = &quot;&quot;;
+	var msgContent = $(&apos;obxObservationValue&apos;).match(/PATIENT CLASS:.*/i);
+	if (msgContent == null) {
+		// No content found starting with word &quot;PATIENT CLASS:&quot;
+		logger.error(&quot;No content found starting with word &apos;PATIENT CLASS:&quot;);
+	} else {
+		// now exclude the PATIENT CLASS: patientInfo line.  It&apos;ll be the index 0.
+		var tempMsgString = msgContent[0].split(&quot;&lt;br&gt;&quot;);
+		for (var i=1; i &lt; tempMsgString.length; i++) { 
+			obx += tempMsgString[i] + &quot;&lt;br&gt;&quot;;
+		}
+	}
+
+	if (obx.length &lt; 1) {
+		obx = msgContent[0];
+	}
+
+	obx = obx.replace(/\\n/g, &quot;&lt;br&gt;&quot;);
+	obx = obx.replace(&quot;\n&quot;, &quot;&lt;br&gt;&quot;);
+
+	if (dos == &quot;NOW()&quot;) {
+		query = &quot;INSERT INTO pnotes ( pnotesdtadd, pnotesdt, pnotesdoc, pnotespat, pnotestypist, pnotes_I ) VALUES ( NOW(), &quot; + dos + &quot;, &quot; + providerId + &quot;, &quot; + patientId + &quot;, &apos;(iMedX)&apos;, &apos;&quot; + addslashes(obx) + &quot;&apos;)&quot;;
+	} else {
+		query = &quot;INSERT INTO pnotes ( pnotesdtadd, pnotesdt, pnotesdoc, pnotespat, pnotestypist, pnotes_I ) VALUES ( NOW(), &apos;&quot; + dos + &quot;&apos;, &quot; + providerId + &quot;, &quot; + patientId + &quot;, &apos;(iMedX)&apos;, &apos;&quot; + addslashes(obx) + &quot;&apos;)&quot;;
+	}
+
+	tableName = &quot;pnotes&quot;;
+
+} else if ($(&apos;obxMessageType&apos;) == &quot;LT&quot;) {
+	// Letter
+
+	var rawObx = $(&apos;obxObservationValue&apos;).match(/.*/i);
+	obx = rawObx[0];
+	obx = obx.replace(/\\n/g, &quot;&lt;br&gt;&quot;);
+	obx = obx.replace(&quot;\n&quot;, &quot;&lt;br&gt;&quot;);
+
+	// find the physician the letter is sent out to. and fill in the &apos;letterto&apos; column. so that the physician&apos;s name/address would appear in the letter.
+	// ex) May 10, 2007&lt;br&gt;&lt;br&gt;Paul D. Matzkin, M.D.&lt;br&gt;5 Dunning Street&lt;br&gt;Claremont, NH 03743
+	// firstname, last name, zip code.
+	var letterToPhysicianInfo, phyFullName, phyFirstName;
+	try {
+		logger.info(&quot;Extracting physician info&quot;);
+		letterToPhysicianInfo = obx.split(&quot;&lt;br&gt;&quot;);
+		logger.info(&quot;letterToPhysicianInfo = &quot; + letterToPhysicianInfo[2]);
+		logger.info(&quot;letterToPhysicianInfo = &quot; + letterToPhysicianInfo[3]);
+		phyFullName = letterToPhysicianInfo[2].split(&quot; &quot;);
+		phyFirstName = phyFullName[0];
+	} catch (e) {
+		logger.error(&quot;Failed to extract physician name&quot;);
+	}
+        
+	var phyLastName;
+	try {
+		phyLastName = phyFullName[2].replace(&quot;,&quot;, &quot;&quot;);	// remove the , at the end.
+	} catch (e) {
+		logger.error(&quot;phyFullName[2] = &quot; + phyFullName[2]);
+	}
+	var phyCityStateZipcode;
+	var phyZipcode;
+	try {
+		phyCityStateZipcode = letterToPhysicianInfo[4].split(&quot; &quot;);
+		phyZipcode = phyCityStateZipcode[2];
+	} catch (e) {
+		logger.error(&quot;Could not extract CSZ&quot;);
+	}
+
+	query = &quot;SELECT id FROM physician WHERE phylname=&apos;&quot; + phyLastName + &quot;&apos; AND phyfname=&apos;&quot; + phyFirstName + &quot;&apos; AND phyzipa=&apos;&quot; + phyZipcode + &quot;&apos;&quot;;
+	result = dbConn.executeCachedQuery(query);
+	var letterToPhysician = &quot;&quot;;
+	if (result.next()) {
+		letterToPhysician = result.getInt(&quot;id&quot;);
+	} else {
+		logger.error(&quot;No matching letterToPhysician found with Physician = &apos;&quot; + phyLastName + &quot;, &quot; + phyFirstName + &quot;&apos; and Zipcode = &apos;&quot; + phyZipcode + &quot;&apos;&quot;);
+	}
+	result.close();
+
+	var letterContent = $(&apos;obxObservationValue&apos;).match(/Dear.*/ig);
+	if (letterContent == null) {
+		// No letter content found starting with word &quot;Dear&quot;
+		logger.error(&quot;No letter content found starting with word &apos;Dear&apos;&quot;);
+	} else {
+		var sincerelyIndex = letterContent[0].search(/Sincerely,.*/i);
+		if (sincerelyIndex != -1) {
+			// remove signature.
+                        try {
+			    obx = letterContent[0].replace(/Sincerely,.*/i, &apos;&apos;);
+                        } catch (e) { }
+		} else {
+			obx = letterContent[0];
+		}
+	}
+
+	if (dos == &quot;NOW()&quot;) {
+		query = &quot;INSERT INTO letters ( letterdt, letterfrom, letterto, letterpatient, lettertypist, lettertext ) VALUES (&quot; + dos + &quot;, &apos;&quot; + providerId + &quot;&apos;, &apos;&quot; + letterToPhysician + &quot;&apos;, &quot; + patientId + &quot;, &apos;(iMedX)&apos;, REPLACE(&apos;&quot; + addslashes(obx) + &quot;&apos;, &apos;\\\\n&apos;, &apos;&lt;br&gt;&apos;))&quot;;
+	} else {
+		query = &quot;INSERT INTO letters ( letterdt, letterfrom, letterto, letterpatient, lettertypist, lettertext ) VALUES (&apos;&quot; + dos + &quot;&apos;, &apos;&quot; + providerId + &quot;&apos;, &apos;&quot; + letterToPhysician + &quot;&apos;, &quot; + patientId + &quot;, &apos;(iMedX)&apos;, REPLACE(&apos;&quot; + addslashes(obx) + &quot;&apos;, &apos;\\\\n&apos;, &apos;&lt;br&gt;&apos;))&quot;;
+	}
+	logger.info(&quot;query = &quot; + query);
+
+	tableName = &quot;letters&quot;;
+
+} else {
+	// unknown OBX message type.
+	logger.error(&quot;Error: Unknown OBX Message Type = &apos;&quot; + $(&apos;obxMessageType&apos;) + &quot;&apos;&quot;);
+}
+
+result = dbConn.executeUpdate( query );
+
+// Retrieve last ID
+var lastId = getLastInsertedId( );
+
+// Insert information into processor queue table
+//var queueQuery = &quot;INSERT INTO rtfProcessQueue ( tableName, recordId ) VALUES ( &apos;&quot; + addslashes( tableName ) + &quot;&apos;, &apos;&quot; + addslashes( lastId ) + &quot;&apos; ); &quot;;
+//var queueResult = dbConn.executeUpdate( queueQuery );
+
+// Close out, finish up
+dbConn.close();
+</property>
+        <property name="password">freemed</property>
+        <property name="host">query</property>
+        <property name="driver">com.mysql.jdbc.Driver</property>
+      </properties>
+      <transformer>
+        <steps/>
+        <inboundTemplate></inboundTemplate>
+        <outboundTemplate></outboundTemplate>
+        <inboundProtocol>HL7V2</inboundProtocol>
+        <outboundProtocol>HL7V2</outboundProtocol>
+        <inboundProperties/>
+        <outboundProperties/>
+      </transformer>
+      <filter>
+        <rules/>
+      </filter>
+      <transportName>Database Writer</transportName>
+      <mode>DESTINATION</mode>
+      <enabled>true</enabled>
+    </com.webreach.mirth.model.Connector>
+  </destinationConnectors>
+  <properties>
+    <property name="synchronous">true</property>
+    <property name="removeNamespace">true</property>
+    <property name="transactional">false</property>
+    <property name="initialState">started</property>
+    <property name="dont_store_filtered">false</property>
+    <property name="error_messages_only">false</property>
+    <property name="max_message_age">-1</property>
+    <property name="store_messages">true</property>
+    <property name="encryptData">false</property>
+  </properties>
+  <preprocessingScript>// Modify the message variable below to pre process data
+return message;</preprocessingScript>
+  <postprocessingScript>// This script executes once after a message has been processed
+return;</postprocessingScript>
+  <deployScript>// This script executes once when the mule engine is started
+// You only have access to the globalMap here to persist data
+return;</deployScript>
+  <shutdownScript>// This script executes once when the mule engine is stopped
+// You only have access to the globalMap here to persist data
+return;</shutdownScript>
+</com.webreach.mirth.model.Channel>
